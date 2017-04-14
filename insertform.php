@@ -1,18 +1,12 @@
-<?php require_once('C:/wamp64/www/cd/Includes/Functions.php'); 
-	if(isset($_POST['name']))
-	{
-		echo newEntry($_POST['name'],$_POST['genre'],(int)$_POST['visible'],(int)$_POST['stock'],(int)$_POST['releaseyear'],(int)$_POST['ItemType']);
-	}
-?>
 <body>
+<form action="insertform.php" method="post">
 Select an item type!
-<select name="ItemType" method="post">
+<select id="ItemType" name="ItemType" method="post">
   <option value="0">Album</option>
   <option value="1">Movie</option>
   <option value="2">Game</option>
 </select>
-
-<form action="insertform.php" method="post">
+	</br>
 	Name: <input type="text" name="name"></br>
 	Genre: <input type="text" name="genre"></br>
 	Visible: <input type="text" name="visible"></br>
@@ -22,3 +16,10 @@ Select an item type!
 </form>
 </body>
 </html>
+<?php require_once('C:/wamp64/www/cd/Includes/Functions.php'); 
+	if(isset($_POST['name']))
+	{
+		//print_r($_POST);
+		echo newEntry($_POST['name'],$_POST['genre'],(int)$_POST['visible'],(int)$_POST['stock'],(int)$_POST['releaseyear'],(int)$_POST['ItemType']);
+	}
+?>
