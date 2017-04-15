@@ -1,3 +1,8 @@
+<?php
+		require_once('C:/wamp64/www/cd/Includes/Functions.php'); 
+		session_start();
+		UserPrintout();
+?>
 <body>
 <form action="InsertForm.php" method="post">
 Select an item type!
@@ -17,7 +22,7 @@ Select an item type!
 </form>
 </body>
 </html>
-<?php require_once('C:/wamp64/www/cd/Includes/Functions.php'); 
+<?php  
 	if(isset($_POST['name']))
 	{
 		echo newEntry($_POST["name"],$_POST["genre"],(int)$_POST['stock'],(int)$_POST['releaseyear'],(int)$_POST['visible'],$_POST['price'],(int)$_POST['ItemType']);
