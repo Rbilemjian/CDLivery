@@ -1,3 +1,4 @@
+<div align = "center">
 <?php 
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
 		if(isset($_POST['register1']))
