@@ -109,4 +109,22 @@
 		mysqli_close($connection);
 		return $result;
 	}
+	function UserPrintout()
+	{
+		if(isset($_GET['logout']) && $_GET['logout'] == "true")
+		{
+			$_SESSION['username'] = null;
+			$_SESSION['id'] = null;
+		}
+		if(isset($_SESSION['username']))
+		{
+			echo '<p align =  "right">'."Logged in as: ".'<b>'.$_SESSION['username'].'</b>';
+			echo '&nbsp;&nbsp;&nbsp;&nbsp';
+			echo '<a href="?logout=true"><b>Log out</b></a>';
+		}
+		else
+		{
+			echo '<p align = "right"><a href="LoginPage.php">Log in</a>';
+		}
+	}
 ?>

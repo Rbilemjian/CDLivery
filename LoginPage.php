@@ -5,7 +5,6 @@
 		{
 			//$required_fields = array("username","password");
 			//validatePresences($required_fields);
-			
 			if(empty($errors))
 			{
 				$username = $_POST["username"];
@@ -15,7 +14,15 @@
 				{
 					$_SESSION["username"] = $user["username"];
 					$_SESSION["id"] = $user["id"];
-					redirectTo("MainPage.php");
+					if(isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER']!=""
+					&& $_SERVER['HTTP_REFERER']!="http://localhost/cd/LoginPage.php")
+					{
+						redirectTo($_SERVER['HTTP_REFERER']);
+					}
+					else
+					{
+						redirectTo("MainPage.php");
+					}
 				}
 				else
 				{
@@ -24,6 +31,7 @@
 			}
 		}
 	?>
+	<div align="center">
 	<html lang="en">
 	<head>
 		<title>LoginPage</title>

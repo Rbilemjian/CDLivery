@@ -7,6 +7,9 @@
 	</head>
 	<body>
 	<?php
+		require_once('C:/wamp64/www/cd/Includes/Functions.php');
+		session_start();
+		UserPrintout();
 		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
 		
 		if(mysqli_connect_errno())
