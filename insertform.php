@@ -1,5 +1,10 @@
+<?php
+	require_once('C:/wamp64/www/cd/Includes/Functions.php');
+	session_start();
+	UserPrintout();
+?>
 <body>
-<form action="insertform.php" method="post">
+<form action="InsertForm.php" method="post">
 Select an item type!
 <select id="ItemType" name="ItemType" method="post">
   <option value="0">Album</option>
@@ -16,7 +21,7 @@ Select an item type!
 </form>
 </body>
 </html>
-<?php require_once('C:/wamp64/www/cd/Includes/Functions.php'); 
+<?php
 	if(isset($_POST['name']))
 	{
 		//print_r($_POST);
