@@ -74,29 +74,25 @@
 			return true;
 		}
 	}
-	function newEntry($name,$genre,$visible,$stock,$releaseyear,$itemType)
+	function newEntry($name,$genre,$stock,$releaseyear,$visible,$price,$type)
 	{
+		if($type == 0)	$typename = 'Album';
+		if($type == 1)	$typename = 'Movie';
+		if($type == 2)	$typename = 'Game';
 		$connection=mysqli_connect("localhost","cd_user","password","cd_livery");
 		if (mysqli_connect_errno())
 		{
 			echo "Failed to connect to MySQL: " . mysqli_connect_error();
 		}
-		if($itemType==0)
-		{
-			$sql="INSERT INTO albums (album_name,genre,visible,stock,release_year)VALUES
-			({$name},{$genre},{$visible},{$stock},{$releaseyear})";
+		else
+		{	
+			$query  = "INSERT INTO cds (";
+			$query .= "  name, type, genre, stock, release_year, visible, price";
+			$query .= ") VALUES (";
+			$query .= "'{$name}','{$typename}','{$genre}',{$stock},{$releaseyear},{$visible},{$price}";
+			$query .= ")";
 		}
-		if($itemType==1)
-		{
-			$sql="INSERT INTO movies (movie_name,genre,visible,stock,release_year)VALUES
-			({$name},{$genre},{$visible},{$stock},{$releaseyear})";
-		}
-		if($itemType==2)
-		{
-			$sql="INSERT INTO games (game_name,genre,visible,stock,release_year)VALUES";
-			$sql.=" ('{$name}','{$genre}',{$visible},{$stock},{$releaseyear})";
-		}
-		$result = mysqli_query($connection, $sql);
+		$result = mysqli_query($connection, $query);
 
 		if ($result && mysqli_affected_rows($connection) == 1) 
 		{
@@ -126,5 +122,38 @@
 		{
 			echo '<p align = "right"><a href="LoginPage.php">Log in</a>';
 		}
+	}
+	function printList($query,$type)
+	{
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		$result = mysqli_query($connection,$query);
+		if(!$result)
+		{
+			die("Database query failed");
+		}
+		echo '<table border="1">';
+		echo "<tr><th>Title</th><th>Genre</th><th>Year of Release</th><th>Stock</th><th>Type</th><th>Price</th></tr>"; 
+		$cd = mysqli_fetch_assoc($result);
+		
+			echo "<tr><td>";
+			echo $cd["name"];
+			echo "</td><td>";
+			echo $cd["genre"];
+			echo "</td><td>";
+			echo $cd["release_year"];
+			echo "</td><td>";
+			echo $cd["stock"];
+			echo "</td><td>";
+			echo $cd["type"];
+			echo "</td><td>";
+			echo '$'.$cd["price"];
+			echo "</td></tr>";
+		
+		echo '</table>';
 	}
 ?>
