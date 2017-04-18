@@ -1,8 +1,32 @@
 <?php 
 		require_once('C:/wamp64/www/cd/Includes/Functions.php'); 
 		session_start();
+		if(isset($_GET['logout']) && $_GET['logout'] == true) //if user was logged in and chose to log out
+		{
+			$_SESSION['username'] = null;
+			$_SESSION['id'] = null;
+		}
+		if(isset($_SESSION['username'])) //if user is logged in already
+		{
+			echo "You are already logged in.";
+			echo "<br />";
+			echo '<a href="?logout=true"><b>Log out</b></a>';
+			echo "<br />";
+			echo '<a href="MainPage.php"><b>Main Page</b></a>';
+			die();
+		}
+		/*$server="";
+		if(isset($_SERVER['HTTP_REFERER'])&&isset($_SERVER['REQUEST_URI']))
+		{
+			$s = $_SERVER['HTTP_REFERER'];
+			if($s!=$_SERVER['REQUEST_URI'])
+			{
+				$server=$s;
+			}
+		}*/
 		if(isset($_POST['submit']))
 		{
+		
 			//$required_fields = array("username","password");
 			//validatePresences($required_fields);
 			if(empty($errors))
@@ -14,15 +38,15 @@
 				{
 					$_SESSION["username"] = $user["username"];
 					$_SESSION["id"] = $user["id"];
-					if(isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER']!=""
-					&& $_SERVER['HTTP_REFERER']!="http://localhost/cd/LoginPage.php")
+					$s = $_SERVER['HTTP_REFERER'];
+					/*if(strlen($server)>1)
 					{
-						redirectTo($_SERVER['HTTP_REFERER']);
+						redirectTo($server);
 					}
 					else
-					{
+					{*/
 						redirectTo("MainPage.php");
-					}
+					//}
 				}
 				else
 				{
