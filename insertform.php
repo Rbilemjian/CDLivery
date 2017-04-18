@@ -22,7 +22,6 @@ Select an item type!
 </form>
 </body>
 </html>
-<?php  
 	if(isset($_POST['name']))
 	{
 		echo newEntry($_POST["name"],$_POST["genre"],(int)$_POST['stock'],(int)$_POST['releaseyear'],(int)$_POST['visible'],$_POST['price'],(int)$_POST['ItemType']);
