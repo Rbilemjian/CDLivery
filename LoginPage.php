@@ -15,20 +15,8 @@
 			echo '<a href="MainPage.php"><b>Main Page</b></a>';
 			die();
 		}
-		/*$server="";
-		if(isset($_SERVER['HTTP_REFERER'])&&isset($_SERVER['REQUEST_URI']))
-		{
-			$s = $_SERVER['HTTP_REFERER'];
-			if($s!=$_SERVER['REQUEST_URI'])
-			{
-				$server=$s;
-			}
-		}*/
 		if(isset($_POST['submit']))
 		{
-		
-			//$required_fields = array("username","password");
-			//validatePresences($required_fields);
 			if(empty($errors))
 			{
 				$username = $_POST["username"];
@@ -38,14 +26,8 @@
 				{
 					$_SESSION["username"] = $user["username"];
 					$_SESSION["id"] = $user["id"];
-					$s = $_SERVER['HTTP_REFERER'];
-					/*if(strlen($server)>1)
-					{
-						redirectTo($server);
-					}
-					else
-					{*/
-						redirectTo("MainPage.php");
+					$_SESSION["type"] = $user["type"];
+					redirectTo("MainPage.php");
 					//}
 				}
 				else

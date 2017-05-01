@@ -16,5 +16,14 @@
 		<a href="AlbumsPage.php">Albums Database</a>
 		<br />
 		<a href="VideogamesPage.php">Videogames Database</a>
+		<?php
+		if(IsAdmin())
+		{
+			?>
+		<br />
+		<a href="RemovedItems.php">Removed Items</a>
+		<?php
+		}
+		?>
 	</body>
 </html>

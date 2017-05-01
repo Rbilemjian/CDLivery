@@ -1,6 +1,9 @@
 <div align = "center">
 <?php 
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
+		echo '<p align = "left">';
+		echo '<a href="MainPage.php"><b>Main Page</b></a>';
+		echo '</br>';
 		if(isset($_POST['register1']))
 		{
 			$required_fields = array("username","password","password2");
@@ -35,6 +38,7 @@
 			}
 			errorcheckingdone:
 		}
+		echo '<p align = "center">';
 		echo "Choose a username and password. Minimum length: 6 characters"
 		?>
 	<html lang="en">
