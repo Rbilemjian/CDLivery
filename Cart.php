@@ -10,8 +10,16 @@
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
 		session_start();
 		UserPrintout();
-		echo '<a href="MainPage"><b>Main Page</b><a><br />';
-		displayCart($_SESSION['id']);
+		if(isset($_SESSION['id']))
+		{
+			displayCart($_SESSION['id']);
+		}
+		else
+		{
+			echo "Must be logged in to view cart.";
+		}
+		
+		
 	?>
 	</body>
 </html>

@@ -10,7 +10,14 @@
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
 		session_start();
 		UserPrintout();
-		printList("SELECT * FROM cds WHERE visible=1 AND type='Album'",'Album');
+		if(isset($_SESSION['type']) && $_SESSION['type'] == 'admin')
+		{
+			AdminList("SELECT * FROM cds WHERE visible=1 AND type='Album'",'Album');
+		}
+		else
+		{
+			printList("SELECT * FROM cds WHERE visible=1 AND type='Album'",'Album');
+		}
 		?>
 	</body>
 </html>

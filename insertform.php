@@ -2,6 +2,10 @@
 		require_once('C:/wamp64/www/cd/Includes/Functions.php'); 
 		session_start();
 		UserPrintout();
+		if(!isset($_SESSION['type']) || $_SESSION['type'] != 'admin')
+		{
+			die("Must be logged in as an administrator in order to add item.");
+		}
 ?>
 <body>
 <form action="InsertForm.php" method="post">
@@ -16,15 +20,15 @@ Select an item type!
 	Genre: <input type="text" name="genre"></br>
 	Stock: <input type="text" name="stock"></br>
 	Release Year: <input type="text" name="releaseyear"></br>
-	Visible: <input type="text" name="visible"></br>
+	Visible (Yes/No): <input type="text" name="visible"></br>
 	Price: <input type="text" name="price"></br>
 <input type="submit" name="submit" value="Submit">
 </form>
 </body>
 </html>
 <?php
-	if(isset($_POST['name']))
+	if(isset($_POST['submit']))
 	{
-		echo newEntry($_POST["name"],$_POST["genre"],(int)$_POST['stock'],(int)$_POST['releaseyear'],(int)$_POST['visible'],$_POST['price'],(int)$_POST['ItemType']);
+		echo newEntry($_POST["name"],$_POST["genre"],(int)$_POST['stock'],(int)$_POST['releaseyear'],$_POST['visible'],$_POST['price'],(int)$_POST['ItemType']);
 	}
 ?>
