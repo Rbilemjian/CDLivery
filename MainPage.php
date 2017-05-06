@@ -22,6 +22,10 @@
 			?>
 		<br />
 		<a href="RemovedItems.php">Removed Items</a>
+		<br />
+		<a href="InsertForm.php">New Database Entry</a>
+		<br />
+		<a href="EditUserPrivileges">Edit User Privileges</a>
 		<?php
 		}
 		?>
