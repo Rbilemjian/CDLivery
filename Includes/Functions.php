@@ -253,6 +253,7 @@
 		{
 			removeFromCart($_GET['remove'], $id);
 		}
+		$price = 0;
 		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
 		if(mysqli_connect_errno())
 		{
@@ -276,6 +277,7 @@
 			$result=mysqli_query($connection,$query);
 			$cd=mysqli_fetch_assoc($result);
 			$itemid=$cd["id"];
+			$price = $price + ($cd['price'] * $quantities[$i]);
 			echo "<tr><td>";
 			echo '<div align="center">';
 			echo $cd["name"];
@@ -319,6 +321,12 @@
 		}
 		echo '</table>';;
 		echo "<br />";
+		echo "Total Price: $". $price;
+		$_SESSION['totalPrice'] = $price;
+		?>
+		<a href="ShippingInfo">Checkout</a>
+		<?php
+		
 	}
 	function removeFromCart($itemNum,$userid)
 	{
@@ -793,12 +801,10 @@
 		if($user['type'] == "admin")
 		{
 			$query = "update users set type='user' where id=$id;";
-			echo $query;
 		}
 		else if($user['type'] == "user")
 		{
 			$query = "update users set type='admin' where id=$id;";
-			echo $query;
 		}
 		$result = mysqli_query($connection,$query);
 		if(!$result)
@@ -806,6 +812,314 @@
 			echo "Could not modify user privileges";
 		}
 	}
+	
+	//checkout functions
+	
+	function paymentForm()
+	{
+		if(isset($_POST['submit']))
+		{
+			if($_POST['ItemType'] == ""||$_POST['name']==""||$_POST['CCnum']==""
+			||$_POST['CVCnum']==""||$_POST['expDate']=="")
+			{
+				echo "Error: All fields must be filled";
+			}
+			else
+			{
+				return array($_POST['ItemType'], $_POST['name'], $_POST['CCnum'], $_POST['CVCnum'], $_POST['expDate']);
+			}
+		}
+		?>
+		<form method="post">
+		Select Credit Card Type
+		<select id="ItemType" name="ItemType" method="post">
+		<option value="American Express">American Express</option>
+		<option value="Diners Club Carte Blanche">Diners Club Carte Blanche</option>
+		<option value="Discover">Discover</option>
+		<option value="Diners Club Enroute">Diners Club Enroute</option>
+		<option value="JCB">JCB</option>
+		<option value="Maestro">Maestro</option>
+		<option value="MasterCard">MasterCard</option>
+		<option value="Solo">Solo</option>
+		<option value="Switch">Switch</option>
+		<option value="VISA">VISA</option>
+		<option value="VISA Electron">VISA Electron</option>
+		<option value="LaserCard">LaserCard</option>
+		</select>
+		</br>
+		Name as it appears on the card: <input type="text" name="name"></br>
+		Credit Card Number: <input type="text" name="CCnum"></br>
+		CVC Number: <input type="text" name="CVCnum"></br>
+		Expiration Date: <input type="text" name="expDate"></br>
+		<input type="submit" name="submit" value="Next">
+		</form>
+		<?php
+	}
+	
+	function shippingForm()
+	{
+		if(isset($_POST['submit']))
+		{
+			if($_POST['name']==""||$_POST['adLine1']==""||$_POST['city']==""||
+			$_POST['state']==""||$_POST['zipCode']=="")
+			{
+				echo "Error: All fields must be filled";
+			}
+			else
+			{
+				return array($_POST['name'],$_POST['adLine1'],$_POST['adLine2'],$_POST['city'],$_POST['state'],$_POST['zipCode']);
+			}
+		}
+		?>
+		<form action="ShippingInfo.php" method="post">
+		<b>Enter an Address Within the United States</b>
+		</br>
+		Full Name: <input type="text" name="name"></br>
+		Address Line 1: <input type="text" name="adLine1"></br>
+		Address Line 2: <input type="text" name="adLine2"></br>
+		City: <input type="text" name="city"></br>
+		State: <input type="text" name="state"></br>
+		ZIP/Postal Code: <input type="text" name="zipCode"></br>
+		<input type="submit" name="submit" value="Next">
+		</form>
+		<?php
+	}
+	
+	function PromoForm()
+	{
+		$codes = array("15OFF","WANG","HAM","RAFFISPLACE","ALEKINS","EDDIE");
+		if(isset($_POST['submit']))
+		{
+			if($_POST['promoCode'] == "")
+			{
+				echo "Error: Must enter promo code in order to redeem promo code.";
+			}
+			else
+			{
+				if(in_array($_POST['promoCode'], $codes))
+				{
+					return $_POST['promoCode'];
+				}
+				else
+				{
+					echo "Error: Invalid promo code.";
+				}
+			}
+		}
+		?>
+		<form action="PromoCodePage.php" method="post">
+		<b>Enter a Promo Code if you have one</b>
+		</br>
+		Promo Code: <input type="text" name="promoCode"></br>
+		<input type="submit" name="submit" value="Submit">
+		</form>
+		<a href="ConfirmationPage">Skip</a>
+		<?php
+	}
+	
+	
+	
+	
+	
+function checkCreditCard ($cardnumber, $cardname) 
+{
+	$errornumber;
+	$errortext;
+  // Define the cards we support. You may add additional card types.
+  
+  //  Name:      As in the selection box of the form - must be same as user's
+  //  Length:    List of possible valid lengths of the card number for the card
+  //  prefixes:  List of possible prefixes for the card
+  //  checkdigit Boolean to say whether there is a check digit
+  
+  // Don't forget - all but the last array definition needs a comma separator!
+  
+  $cards = array (  array ('name' => 'American Express', 
+                          'length' => '15', 
+                          'prefixes' => '34,37',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'Diners Club Carte Blanche', 
+                          'length' => '14', 
+                          'prefixes' => '300,301,302,303,304,305',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'Diners Club', 
+                          'length' => '14,16',
+                          'prefixes' => '36,38,54,55',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'Discover', 
+                          'length' => '16', 
+                          'prefixes' => '6011,622,64,65',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'Diners Club Enroute', 
+                          'length' => '15', 
+                          'prefixes' => '2014,2149',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'JCB', 
+                          'length' => '16', 
+                          'prefixes' => '35',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'Maestro', 
+                          'length' => '12,13,14,15,16,18,19', 
+                          'prefixes' => '5018,5020,5038,6304,6759,6761,6762,6763',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'MasterCard', 
+                          'length' => '16', 
+                          'prefixes' => '51,52,53,54,55',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'Solo', 
+                          'length' => '16,18,19', 
+                          'prefixes' => '6334,6767',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'Switch', 
+                          'length' => '16,18,19', 
+                          'prefixes' => '4903,4905,4911,4936,564182,633110,6333,6759',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'VISA', 
+                          'length' => '16', 
+                          'prefixes' => '4',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'VISA Electron', 
+                          'length' => '16', 
+                          'prefixes' => '417500,4917,4913,4508,4844',
+                          'checkdigit' => true
+                         ),
+                   array ('name' => 'LaserCard', 
+                          'length' => '16,17,18,19', 
+                          'prefixes' => '6304,6706,6771,6709',
+                          'checkdigit' => true
+                         )
+                );
+
+  $ccErrorNo = 0;
+
+  $ccErrors [0] = "Unknown card type";
+  $ccErrors [1] = "No card number provided";
+  $ccErrors [2] = "Credit card number has invalid format";
+  $ccErrors [3] = "Credit card number is invalid";
+  $ccErrors [4] = "Credit card number is wrong length";
+               
+  // Establish card type
+  $cardType = -1;
+  for ($i=0; $i<sizeof($cards); $i++) {
+
+    // See if it is this card (ignoring the case of the string)
+    if (strtolower($cardname) == strtolower($cards[$i]['name'])) {
+      $cardType = $i;
+      break;
+    }
+  }
+  
+  // If card type not found, report an error
+  if ($cardType == -1) {
+     $errornumber = 0;     
+     $errortext = $ccErrors [$errornumber];
+     return false; 
+  }
+   
+  // Ensure that the user has provided a credit card number
+  if (strlen($cardnumber) == 0)  {
+     $errornumber = 1;     
+     $errortext = $ccErrors [$errornumber];
+     return false; 
+  }
+  
+  // Remove any spaces from the credit card number
+  $cardNo = str_replace (' ', '', $cardnumber);  
+   
+  // Check that the number is numeric and of the right sort of length.
+  if (!preg_match("/^[0-9]{13,19}$/",$cardNo))  {
+     $errornumber = 2;     
+     $errortext = $ccErrors [$errornumber];
+     return false; 
+  }
+       
+  // Now check the modulus 10 check digit - if required
+  if ($cards[$cardType]['checkdigit']) {
+    $checksum = 0;                                  // running checksum total
+    $mychar = "";                                   // next char to process
+    $j = 1;                                         // takes value of 1 or 2
+  
+    // Process each digit one by one starting at the right
+    for ($i = strlen($cardNo) - 1; $i >= 0; $i--) {
+    
+      // Extract the next digit and multiply by 1 or 2 on alternative digits.      
+      $calc = $cardNo{$i} * $j;
+    
+      // If the result is in two digits add 1 to the checksum total
+      if ($calc > 9) {
+        $checksum = $checksum + 1;
+        $calc = $calc - 10;
+      }
+    
+      // Add the units element to the checksum total
+      $checksum = $checksum + $calc;
+    
+      // Switch the value of j
+      if ($j ==1) {$j = 2;} else {$j = 1;};
+    } 
+  
+    // All done - if checksum is divisible by 10, it is a valid modulus 10.
+    // If not, report an error.
+    if ($checksum % 10 != 0) {
+     $errornumber = 3;     
+     $errortext = $ccErrors [$errornumber];
+     return false; 
+    }
+  }  
+
+  // The following are the card-specific checks we undertake.
+
+  // Load an array with the valid prefixes for this card
+  $prefix = explode(',',$cards[$cardType]['prefixes']);
+      
+  // Now see if any of them match what we have in the card number  
+  $PrefixValid = false; 
+  for ($i=0; $i<sizeof($prefix); $i++) {
+    $exp = '/^' . $prefix[$i] . '/';
+    if (preg_match($exp,$cardNo)) {
+      $PrefixValid = true;
+      break;
+    }
+  }
+      
+  // If it isn't a valid prefix there's no point at looking at the length
+  if (!$PrefixValid) {
+     $errornumber = 3;     
+     $errortext = $ccErrors [$errornumber];
+     return false; 
+  }
+    
+  // See if the length is valid for this card
+  $LengthValid = false;
+  $lengths = explode(',',$cards[$cardType]['length']);
+  for ($j=0; $j<sizeof($lengths); $j++) {
+    if (strlen($cardNo) == $lengths[$j]) {
+      $LengthValid = true;
+      break;
+    }
+  }
+  
+  // See if all is OK by seeing if the length was valid. 
+  if (!$LengthValid) {
+     $errornumber = 4;     
+     $errortext = $ccErrors [$errornumber];
+     return false; 
+  };   
+  
+  // The credit card is in the required format.
+  return true;
+}
 	
 	
 	
