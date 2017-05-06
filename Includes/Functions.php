@@ -724,5 +724,98 @@
 		}
 	}
 	
+	function listUsers($type)
+	{
+		if(isset($_POST['userID']))
+		{
+			changeAccountPrivileges($_POST['userID']);
+			unset($_POST['userID']);
+		}
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		$query = "select * from users where type='$type';";
+		$result = mysqli_query($connection,$query);
+		if(!$result)
+		{
+			die("Database query failed");
+		}
+		while($user = mysqli_fetch_assoc($result))
+		{
+			$id = $user['id'];
+			echo "<tr><td>";
+			echo '<div align="center">';
+			echo $user["username"];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $user["type"];
+			echo "</td><td>";
+			echo '<div align="center">';
+			if($user['type'] == "admin")
+			{
+				?>
+				<form method="post">
+				</br>
+				<input type="hidden" name="userID" value=<?php echo $id?>>
+				<input type="submit" value="Revoke Administrator Status">
+				</form>
+				<?php
+			}
+			else if($user['type'] == "user")
+			{
+				?>
+				<form method="post">
+				</br>
+				<input type="hidden" name="userID" value=<?php echo $id?>>
+				<input type="submit" value="Make Administrator">
+				</form>
+				<?php
+			}
+			echo "</td></tr>";
+		}
+	}
+	function changeAccountPrivileges($id)
+	{
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		$query = "select * from users where id=$id;";
+		$result = mysqli_query($connection,$query);
+		if(!$result)
+		{
+			die("Database query failed");
+		}
+		$user = mysqli_fetch_assoc($result);
+		if($user['type'] == "admin")
+		{
+			$query = "update users set type='user' where id=$id;";
+			echo $query;
+		}
+		else if($user['type'] == "user")
+		{
+			$query = "update users set type='admin' where id=$id;";
+			echo $query;
+		}
+		$result = mysqli_query($connection,$query);
+		if(!$result)
+		{
+			echo "Could not modify user privileges";
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 ?>
