@@ -1,6 +1,14 @@
 <div align = "center">
 <?php 
+		session_start();
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
+		if(loggedIn())
+		{
+			echo "You are already logged in";
+			echo '</br>';
+			echo '<a href="MainPage.php"><b>Main Page</b></a>';
+			die();
+		}
 		echo '<p align = "left">';
 		echo '<a href="MainPage.php"><b>Main Page</b></a>';
 		echo '</br>';

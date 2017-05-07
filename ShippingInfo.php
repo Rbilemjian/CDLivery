@@ -10,6 +10,10 @@
 </body>
 </html>
 <?php
+	if(isAdmin() || !loggedIn())
+	{
+		die("Must be logged in as user to access this page");
+	}
 	$_SESSION['confirmPage'] = false;
 	$shippingInfo = shippingForm();
 	$_SESSION['shippingInfo'] = $shippingInfo;

@@ -8,6 +8,10 @@
 	<?php
 	session_start();
 	UserPrintout();
+	if(isset($_POST['placeOrder']))
+	{
+		placeOrder($_SESSION['shippingInfo'],$_SESSION['paymentInfo'], $_SESSION['finalPrice']);
+	}
 	if(isset($_SESSION['confirmPage']) && $_SESSION['confirmPage'] == true)
 	{
 		goto finalPrice;
@@ -52,5 +56,8 @@
 	echo "<br/><b>Last 4 digits of CC#:</b>". substr($paymentInfo[2], 12, 16);
 	$_SESSION['confirmPage'] = true;
 	?>
+	<form method=post>
+	<input type="submit" value="Place Order" name="placeOrder">
+	</form>
 	</body>
 </html>
