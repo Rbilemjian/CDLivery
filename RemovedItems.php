@@ -4,6 +4,10 @@
 	require_once('C:/wamp64/www/cd/Includes/Functions.php');
 	session_start();
 	UserPrintout();
+	if(!isAdmin)
+	{
+		die("Must be logged in as an administrator to view this page");
+	}
 	ListRemoved();
 ?>
 <html lang="en">

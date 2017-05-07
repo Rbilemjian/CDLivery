@@ -2,12 +2,16 @@
 
 <html lang="en">
 	<head>
-		<title>PromoCodes</title>
+		<title>PromoCodePage</title>
 	</head>
 	<body>
 	<?php
 		session_start();
 		UserPrintout();
+		if(!loggedIn() || isAdmin())
+		{
+			die("Must be logged in as a user in order to access this page");
+		}
 		$_SESSION['promoCode'] = PromoForm();
 		if(isset($_SESSION['promoCode']))
 		{

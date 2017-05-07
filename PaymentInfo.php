@@ -8,6 +8,10 @@
 	<?php
 	session_start();
 	UserPrintout();
+	if(!loggedIn() || isAdmin())
+	{
+		die("Must be logged in as a user in order to view this page");
+	}
 	$paymentInfo = paymentForm();
 	if(isset($paymentInfo[0]))
 	{

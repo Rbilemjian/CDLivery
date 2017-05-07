@@ -8,6 +8,7 @@
 		}
 		if(isset($_SESSION['username'])) //if user is logged in already
 		{
+			echo '<div align="center">';
 			echo "You are already logged in.";
 			echo "<br />";
 			echo '<a href="?logout=true"><b>Log out</b></a>';

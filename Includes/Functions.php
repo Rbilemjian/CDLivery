@@ -4,6 +4,16 @@
 		header("Location: ".$page);
 		exit;
 	}
+	
+	function loggedIn()
+	{
+		if(isset($_SESSION['id']))
+		{
+			return true;
+		}
+		return false;
+	}
+	
 	function findUser($username,$password)
 	{
 		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
@@ -139,7 +149,7 @@
 		echo '<br />';
 		echo '<p align = "left">';
 	}
-	function printList($query,$type)
+	function printList($query,$type) //displays CDs of a certain database
 	{
 		if(isset($_GET['id']))
 		{
@@ -222,6 +232,14 @@
 		{
 			$cart=mysqli_fetch_assoc($result);
 			$items=unserialize($cart['itemids']);
+			for($i=0;$i<count($items);$i++)
+			{
+				if($items[$i] ==  $itemid)
+				{
+					echo "Selected item is already in the cart";
+					return;
+				}
+			}
 			array_push($items,$itemid);
 			$quantities=unserialize($cart['quantities']);
 			array_push($quantities,1);
@@ -241,7 +259,6 @@
 			die("Database query failed. " . mysqli_error($connection));
 		}
 		mysqli_close($connection);
-		return;
 	}
 	function displayCart($id)
 	{
@@ -269,13 +286,19 @@
 		$cart = mysqli_fetch_assoc($result);
 		$items=unserialize($cart['itemids']);
 		$quantities=unserialize($cart['quantities']);
+		$size = count($items);
 		echo '<table border="1">';
 		echo "<tr><th>Title</th><th>Genre</th><th>Year of Release</th><th>Stock</th><th>Type</th><th>Price</th><th>Quantity</th><th>Remove?</th><th>Change Quantity</th></tr>"; 
-		for($i=0;$i<count($items);$i++)
+		for($i=0;$i<$size;$i++)
 		{
 			$query="SELECT * FROM cds WHERE id={$items[$i]}";
 			$result=mysqli_query($connection,$query);
 			$cd=mysqli_fetch_assoc($result);
+			if($cd['stock'] == 0 || cd['visible'] == 0)
+			{
+				removeFromCart($i, $id);
+				continue;
+			}
 			$itemid=$cd["id"];
 			$price = $price + ($cd['price'] * $quantities[$i]);
 			echo "<tr><td>";
@@ -366,7 +389,6 @@
 		}
 		if ($result && mysqli_affected_rows($connection) == 1) 
 		{
-			echo "Item successfully removed from cart. ";
 		} 
 		else 
 		{
@@ -386,6 +408,13 @@
 		$query = "select * from carts where id=$id";
 		$result = mysqli_query($connection,$query);
 		$cartitem = mysqli_fetch_assoc($result);
+		//checking if any items' stocks are lower than requested amount in cart
+		$badItems = checkStock($cartitem['itemids'],$cartitem['quantities']);
+		if(count($badItems)>0)
+		{
+			reportStockDeficit($badItems);
+			return;
+		}
 		$quantities = $cartitem['quantities'];
 		$quantities = unserialize($quantities);
 		$quantities[$itemnum] = $quantity;
@@ -813,6 +842,203 @@
 		}
 	}
 	
+	function displayOrders($status)
+	{
+		if(isset($_POST['submit']))
+		{
+			flipStatus($_POST['orderID'], $_POST['status']);
+		}
+		if(isset($_POST['submit1']))
+		{
+			$_SESSION['orderID'] = $_POST['orderID'];
+			redirectTo("ViewOrderItems");
+		}
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		$query = "select * from orders where status='$status';";
+		$result = mysqli_query($connection,$query);
+		if(!$result)
+		{
+			die("Database query failed");
+		}
+		
+		while($order = mysqli_fetch_assoc($result))
+		{
+			echo "<tr><td>";
+			echo '<div align="center">';
+			echo $order['shippingName'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['addressLine1'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			if($order['addressLine2'] == "")
+			{
+				echo "N/A";
+			}
+			else
+			{
+				echo $order['addressLine2'];
+			}
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['city'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['state'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['zipCode'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['paymentName'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['cardType'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['cardNumber'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['CVC'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['expDate'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['status'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			if($order['promoCode'] == "")
+			{
+				echo "N/A";
+			}
+			else
+			{
+				echo $order['promoCode'];
+			}
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo "$". $order['price'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			if($status=="unfulfilled")
+			{
+				?>
+				<form method="post">
+					</br>
+					<input type="hidden" name="orderID" value=<?php echo $order['id']?>>
+					<input type="hidden" name="status" value="unfulfilled">
+					<input type="submit" value="Mark Fulfilled" name="submit">
+					</form>
+				<?php
+			}
+			else if($status=="fulfilled")
+			{
+				?>
+				<form method="post">
+					</br>
+					<input type="hidden" name="orderID" value=<?php echo $order['id']?>>
+					<input type="hidden" name="status" value="fulfilled">
+					<input type="submit" value="Mark Unfulfilled" name="submit">
+					</form>
+				<?php
+			}
+			echo "<br/>";
+			echo "</td><td>";
+			echo '<div align="center">';
+			?>
+			<form method="post">
+					</br>
+					<input type="hidden" name="orderID" value=<?php echo $order['id']?>>
+					<input type="submit" value="View Items" name="submit1">
+					</form>
+			<?php
+			echo "<br/>";
+			
+		}
+	}
+	
+	function displayOrderItems($id)
+	{
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		$query = "select * from orders where id=$id";
+		$result = mysqli_query($connection,$query);	
+		if(!$result)
+		{
+			die("Database query to display order items failed");
+		}
+		$order = mysqli_fetch_assoc($result);
+		$itemids = $order['items'];
+		$quantities = $order['quantities'];
+		$itemids = unserialize($itemids);
+		$quantities = unserialize($quantities);
+		echo '<table border="1">';
+		echo "<tr><th>Title</th><th>Genre</th><th>Year of Release</th><th>Quantity</th><th>Type</th><th>Price</th></tr>"; 
+		for($i = 0;$i<count($itemids);$i++)
+		{
+			$id=$itemids[$i];
+			$query = "select * from cds where id=$id;";
+			$result = mysqli_query($connection, $query);
+			if(!$result)
+			{
+				die("Database query to display item with id $id failed");
+			}
+			$cd = mysqli_fetch_assoc($result);
+			echo "<tr><td>";
+			echo '<div align="center">';
+			echo $cd['name'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $cd["genre"];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $cd["release_year"];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $quantities[$i];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $cd["type"];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo '$'.$cd["price"];
+			echo "</td></tr>";
+		}
+		echo '</table>';
+		
+	}
+	
+	function flipStatus($id, $status)
+	{
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		if($status == "fulfilled")
+		{
+			$query = "update orders set status='unfulfilled' where id=$id;";
+		}
+		else if($status == "unfulfilled")
+		{
+			$query = "update orders set status='fulfilled' where id=$id;";
+		}
+		$result = mysqli_query($connection,$query);
+		if(!$result)
+		{
+			die("Database query failed 927");
+		}
+		
+	}
+	
 	//checkout functions
 	
 	function paymentForm()
@@ -858,6 +1084,7 @@
 	
 	function shippingForm()
 	{
+		//check if there is sufficient stock for items selected here
 		if(isset($_POST['submit']))
 		{
 			if($_POST['name']==""||$_POST['adLine1']==""||$_POST['city']==""||
@@ -915,6 +1142,143 @@
 		</form>
 		<a href="ConfirmationPage">Skip</a>
 		<?php
+	}
+	
+	function placeOrder($shippingInfo, $paymentInfo, $price)
+	{
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		$query = "select * from carts where id={$_SESSION['id']};";
+		$result = mysqli_query($connection,$query);
+		if(!$result)
+		{
+			die("Database query failed");
+		}
+		$cart = mysqli_fetch_assoc($result);
+		$quantities = $cart['quantities'];
+		$items = $cart['itemids'];
+		//check if there is enough stock and modify stock count here
+		$badItems = checkStock($items,$quantities);
+		if(count($badItems)>0)
+		{
+			reportStockDeficit($badItems);
+			die();
+		}
+		$query = "insert into orders (userid, shippingName, addressLine1, addressLine2, city, state, zipcode, paymentName, cardType, cardNumber, CVC, expDate, items, quantities,price,promoCode) ";
+		$query.= "values({$_SESSION['id']}, '{$shippingInfo[0]}', '{$shippingInfo[1]}', '{$shippingInfo[2]}', '{$shippingInfo[3]}', '{$shippingInfo[4]}', {$shippingInfo[5]}, ";
+		$query.= "'{$paymentInfo[1]}', '{$paymentInfo[0]}', '{$paymentInfo[2]}', {$paymentInfo[3]}, '{$paymentInfo[4]}', '{$items}','{$quantities}',$price, '{$_SESSION['promoCode']}');";
+		$result = mysqli_query($connection,$query);
+		if(!$result)
+		{
+			die("Database query failed");
+		}
+		modifyStocks($items,$quantities);
+		redirectTo("CheckoutSuccess");
+	}
+	
+	
+	function checkStock($itemids, $quantities)
+	{
+		$itemids =  unserialize($itemids);
+		$quantities = unserialize($quantities);
+		$badItems = array();
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		for($i = 0;$i<count($quantities);$i++)
+		{
+			$query = "select * from cds where id={$itemids[$i]};";
+			$result = mysqli_query($connection,$query);
+			if(!$result)
+			{
+				die("Database query failed");
+			}
+			$currItem = mysqli_fetch_assoc($result);
+			if($currItem['stock']<$quantities[$i])
+			{
+				array_push($badItems, $itemids[$i]);
+			}
+		}
+		return $badItems;
+	}
+	
+	function modifyStocks($items,$quantities)
+	{
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		$itemids = unserialize($items);
+		$quantitites = unserialize($quantities);
+		$stock = 0;
+		for($i = 0;$i<count($quantities);$i++)
+		{
+			$currItem = fetchItem($itemids[$i]);
+			$stock = currItem['stock'];
+			$stock = $stock-$quantities[$i];
+			$query = "update cds set stock=$stock where id={$itemids[$i]};";
+			$result = mysqli_query($connection, $query);
+			if(!$result)
+			{
+				die("Database query failed");
+			}
+		}
+	}
+	
+	function reportStockDeficit($badItems)
+	{
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		echo "Sorry, the following items are not in stock in the quantity desired:";
+			echo "<br/>";
+			for($i = 0;$i<count($badItems);$i++)
+			{
+				$query = "select * from cds where id={$badItems[$i]};";
+				$result = mysqli_query($connection,$query);
+				if(!$result)
+				{
+					die("Database query failed");
+				}
+				$cd = mysqli_fetch_assoc($result);
+				echo $cd['name']. "<br/>";
+			}
+	}
+	
+	function fetchItem($id)
+	{
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		$query = "select * from cds where id=$id;";
+		$result = mysqli_query($connection,$query);
+		$item = mysqli_fetch_assoc($result);
+		return $item;
+	}
+	
+	function clearCart($id)
+	{
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		$query = "delete from carts where id=$id;";
+		$result = mysqli_query($connection,$query);
+		if(!$result)
+		{
+			die("Database query failed");
+		}
 	}
 	
 	

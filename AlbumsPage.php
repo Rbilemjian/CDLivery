@@ -16,7 +16,7 @@
 		}
 		else
 		{
-			printList("SELECT * FROM cds WHERE visible=1 AND type='Album'",'Album');
+			printList("SELECT * FROM cds WHERE visible=1 AND type='Album' AND stock!=0",'Album');
 		}
 		?>
 	</body>
