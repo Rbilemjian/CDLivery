@@ -15,6 +15,9 @@
 	</head>
 	<body>
 		<p align="left">
+		<?php
+		searchBar();
+		?>
 		<a href="MoviesPage.php">Movies Database</a>
 		<br />
 		<a href="AlbumsPage.php">Albums Database</a>

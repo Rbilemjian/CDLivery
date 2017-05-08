@@ -4,7 +4,6 @@
 		header("Location: ".$page);
 		exit;
 	}
-	
 	function loggedIn()
 	{
 		if(isset($_SESSION['id']))
@@ -128,6 +127,7 @@
 			$_SESSION['username'] = null;
 			$_SESSION['id'] = null;
 			$_SESSION['type'] = null;
+			redirectTo('MainPage');
 		}
 		if(isset($_SESSION['username']))
 		{
@@ -149,7 +149,7 @@
 		echo '<br />';
 		echo '<p align = "left">';
 	}
-	function printList($query,$type) //displays CDs of a certain database
+	function printList($query) //displays CDs of a certain database
 	{
 		if(isset($_GET['id']))
 		{
@@ -170,9 +170,9 @@
 			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
 		}
 		$result = mysqli_query($connection,$query);
-		if(!$result)
+		if(!$result || $result->num_rows == 0)
 		{
-			die("Database query failed");
+			die("There are not any cds of the selected type available");
 		}
 		echo '<table border="1">';
 		echo "<tr><th>Title</th><th>Genre</th><th>Year of Release</th><th>Stock</th><th>Type</th><th>Price</th><th>Add to Cart</th></tr>"; 
@@ -205,6 +205,54 @@
 			echo "</td></tr>";
 		}
 		echo '</table>';
+	}
+	
+	function searchBar()
+	{
+		?>
+		<form method="post" action="SearchResult" id="searchForm">
+		<input type="text" name="search">
+		<input type="submit" name="submit" value="Search">
+		</form>
+		<?php
+	}
+	
+	function contextSearchBar()
+	{
+		?>
+		<form method="post" id="searchForm">
+		<input type="text" name="search">
+		<input type="submit" name="submit" value="Search">
+		</form>
+		<?php
+	}
+	
+	function contextGetResults($search,$type)
+	{
+		if(isAdmin())
+		{
+			$query = "select * from cds where (name like '%$search%' or genre like '%$search%' or release_year like '%$search%') and type='$type';";
+			adminList($query);
+		}
+		else
+		{
+			$query = "select * from cds where (name like '%$search%' or genre like '%$search%' or release_year like '%$search%') and visible = 1 and stock>0 and type='$type';";
+			printList($query);
+		}
+	}
+	
+	function getResults($search)
+	{
+		if(isAdmin())
+		{
+			$query = "select * from cds where name like '%$search%' or genre like '%$search%' or release_year like '%$search%';";
+			adminList($query);
+		}
+		else
+		{
+			$query = "select * from cds where (name like '%$search%' or genre like '%$search%' or release_year like '%$search%') and visible = 1 and stock>0;";
+			printList($query);
+		}
 	}
 	
 	//Cart Functions
@@ -471,7 +519,7 @@
 			echo "Successfully modified stock.";
 		}
 	}
-	function AdminList($query,$type)
+	function AdminList($query)
 	{
 		if(isset($_POST['modify']))
 		{
@@ -495,9 +543,8 @@
 		$result = mysqli_query($connection,$query);
 		if($result->num_rows == 0)
 		{
-			echo "There are not currently any {$type}s available.";
-			echo '<br />';
-			return;
+			echo "</br>";
+			die("There are not currently any cds of that type available.");
 		}
 		echo '<table border="1">';
 		echo "<tr><th>Title</th><th>Genre</th><th>Year of Release</th><th>Stock</th><th>Type</th><th>Price</th><th>Change Stock</th><th>Remove Item</th></tr>"; 

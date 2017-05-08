@@ -9,18 +9,31 @@
 	<?php
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
 		session_start();
+		userPrintout();
+		contextSearchBar();
+		if(isset($_POST['submit']))
+		{
+			if($_POST['search']=="")
+			{
+				die("Must type a query in order to search");
+			}
+			else
+			{
+				contextGetResults($_POST['search'], 'Game');
+				die();
+			}
+		}
 		if(loggedIn())
 		{
 			checkTimeout();
 		}
-		UserPrintout();
 		if(isset($_SESSION['type']) && $_SESSION['type'] == 'admin')
 		{
-			AdminList("SELECT * FROM cds WHERE visible=1 AND type='Game'",'Game');
+			AdminList("SELECT * FROM cds WHERE visible=1 AND type='Game'");
 		}
 		else
 		{
-			printList("SELECT * FROM cds WHERE visible=1 AND type='Game' AND stock!=0",'Game');
+			printList("SELECT * FROM cds WHERE visible=1 AND type='Game' AND stock!=0");
 		}
 	?>
 	

@@ -14,13 +14,26 @@
 			checkTimeout();
 		}
 		UserPrintout();
+		contextSearchBar();
+		if(isset($_POST['submit']))
+		{
+			if($_POST['search']=="")
+			{
+				die("Must type a query in order to search");
+			}
+			else
+			{
+				contextGetResults($_POST['search'], 'Movie');
+				die();
+			}
+		}
 		if(isset($_SESSION['type']) && $_SESSION['type'] == 'admin')
 		{
-			AdminList("SELECT * FROM cds WHERE visible=1 AND type='Movie'",'Movie');
+			AdminList("SELECT * FROM cds WHERE visible=1 AND type='Movie'");
 		}
 		else
 		{
-			printList("SELECT * FROM cds WHERE visible=1 AND type='Movie' AND stock!=0",'Movie');
+			printList("SELECT * FROM cds WHERE visible=1 AND type='Movie' AND stock!=0");
 		}
 	?>
 	</body>
