@@ -10,17 +10,30 @@
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
 		session_start();
 		UserPrintout();
+		contextSearchBar();
+		if(isset($_POST['submit']))
+		{
+			if($_POST['search']=="")
+			{
+				die("Must type a query in order to search");
+			}
+			else
+			{
+				contextGetResults($_POST['search'], 'Album');
+				die();
+			}
+		}
 		if(loggedIn())
 		{
 			checkTimeout();
 		}
 		if(isset($_SESSION['type']) && $_SESSION['type'] == 'admin')
 		{
-			AdminList("SELECT * FROM cds WHERE visible=1 AND type='Album'",'Album');
+			AdminList("SELECT * FROM cds WHERE visible=1 AND type='Album'");
 		}
 		else
 		{
-			printList("SELECT * FROM cds WHERE visible=1 AND type='Album' AND stock!=0",'Album');
+			printList("SELECT * FROM cds WHERE visible=1 AND type='Album' AND stock!=0");
 		}
 		?>
 	</body>
