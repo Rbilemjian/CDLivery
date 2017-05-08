@@ -10,8 +10,9 @@
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
 		session_start();
 		UserPrintout();
-		if(isset($_SESSION['id']))
+		if(loggedIn())
 		{
+			checkTimeout();
 			displayCart($_SESSION['id']);
 		}
 		else

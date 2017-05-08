@@ -294,7 +294,7 @@
 			$query="SELECT * FROM cds WHERE id={$items[$i]}";
 			$result=mysqli_query($connection,$query);
 			$cd=mysqli_fetch_assoc($result);
-			if($cd['stock'] == 0 || cd['visible'] == 0)
+			if($cd['stock'] == 0 || $cd['visible'] == 0)
 			{
 				removeFromCart($i, $id);
 				continue;
@@ -1281,7 +1281,21 @@
 		}
 	}
 	
-	
+	function checkTimeout()
+	{
+		if(time() - $_SESSION['last_time']>300)
+		{
+			$_SESSION['username'] = NULL;
+			$_SESSION['id'] = NULL;
+			$_SESSION['type'] = NULL;
+			$_SESSION['timedOut'] = true;
+			redirectTo('LoginPage');
+		}
+		else
+		{
+			$_SESSION['last_time'] = time();
+		}
+	}
 	
 	
 	

@@ -15,6 +15,7 @@
 			echo "Must be logged in as an administrator in order to view this page.";
 			die();
 		}
+		checkTimeout();
 		if(!isset($_SESSION['orderID']))
 		{
 			echo "Must navigate to this page from order list page.";

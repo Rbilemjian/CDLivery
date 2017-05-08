@@ -1,6 +1,16 @@
 <?php 
 		require_once('C:/wamp64/www/cd/Includes/Functions.php'); 
 		session_start();
+		$_SESSION['last_time'] = time();
+		echo '<p align = "left">';
+		echo '<a href="MainPage.php"><b>Main Page</b></a>';
+		echo '</br>';
+		echo '<p align="center">';
+		if(isset($_SESSION['timedOut']) && $_SESSION['timedOut']==true)
+		{
+			echo "Automatically logged out due to inactivity";
+			unset($_SESSION['timedOut']);
+		}
 		if(isset($_GET['logout']) && $_GET['logout'] == true) //if user was logged in and chose to log out
 		{
 			$_SESSION['username'] = null;
@@ -8,6 +18,7 @@
 		}
 		if(isset($_SESSION['username'])) //if user is logged in already
 		{
+			checkTimeout();
 			echo '<div align="center">';
 			echo "You are already logged in.";
 			echo "<br />";

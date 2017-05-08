@@ -12,6 +12,7 @@
 	{
 		die("Must be logged in as a user in order to view this page");
 	}
+	checkTimeout();
 	$paymentInfo = paymentForm();
 	if(isset($paymentInfo[0]))
 	{

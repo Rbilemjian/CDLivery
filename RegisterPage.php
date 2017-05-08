@@ -4,6 +4,7 @@
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
 		if(loggedIn())
 		{
+			checkTimeout();
 			echo "You are already logged in";
 			echo '</br>';
 			echo '<a href="MainPage.php"><b>Main Page</b></a>';

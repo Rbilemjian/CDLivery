@@ -15,6 +15,7 @@
 			echo "Must be logged in as an administrator in order to view this page.";
 			die();
 		}
+		checkTimeout();
 		?>
 		<form method=post>
 			<select name = "Dropdown">

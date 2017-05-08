@@ -14,6 +14,7 @@
 	{
 		die("Must be logged in as user to access this page");
 	}
+	checkTimeout();
 	$_SESSION['confirmPage'] = false;
 	$shippingInfo = shippingForm();
 	$_SESSION['shippingInfo'] = $shippingInfo;
