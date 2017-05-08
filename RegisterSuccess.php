@@ -8,6 +8,7 @@
 	<?php
 		if(loggedIn())
 		{
+			checkTimeout();
 			die("Error: must be logged out to view this page");
 		}
 		echo "Register Successful! Congratulations!";

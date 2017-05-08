@@ -4,6 +4,10 @@
 	require_once('C:/wamp64/www/cd/Includes/Functions.php');
 	session_start();
 	UserPrintout();
+	if(loggedIn())
+	{
+		checkTimeout();
+	}
 ?>
 <html lang="en">
 	<head>

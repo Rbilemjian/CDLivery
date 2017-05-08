@@ -12,6 +12,7 @@
 		{
 			die("Must be logged in as a user in order to access this page");
 		}
+		checkTimeout();
 		$_SESSION['promoCode'] = PromoForm();
 		if(isset($_SESSION['promoCode']))
 		{

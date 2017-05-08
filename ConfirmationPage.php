@@ -8,6 +8,11 @@
 	<?php
 	session_start();
 	UserPrintout();
+	if(!loggedIn() || isAdmin())
+	{
+		die("Must be logged in as a user in order to view this page");
+	}
+	checkTimeout();
 	if(isset($_POST['placeOrder']))
 	{
 		placeOrder($_SESSION['shippingInfo'],$_SESSION['paymentInfo'], $_SESSION['finalPrice']);

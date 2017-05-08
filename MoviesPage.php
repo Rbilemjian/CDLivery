@@ -9,6 +9,10 @@
 	<?php
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
 		session_start();
+		if(loggedIn())
+		{
+			checkTimeout();
+		}
 		UserPrintout();
 		if(isset($_SESSION['type']) && $_SESSION['type'] == 'admin')
 		{

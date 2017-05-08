@@ -13,6 +13,7 @@
 		{
 			die("Must be logged in as an administrator in order to access this page");
 		}
+		checkTimeout();
 		echo '<table border="1">';
 		echo "<tr><th>Username</th><th>Type</th><th>Edit</th><tr>";
 		listUsers("admin");

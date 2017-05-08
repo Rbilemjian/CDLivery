@@ -6,6 +6,7 @@
 		{
 			die("Must be logged in as an administrator in order to add item.");
 		}
+		checkTimeout();
 ?>
 <body>
 <form action="InsertForm.php" method="post">
