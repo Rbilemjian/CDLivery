@@ -3,26 +3,27 @@
 
 <html lang="en">
 	<head>
-		<title>ViewOrderItems</title>
+		<title>View User Items</title>
 	</head>
 	<body>
 	<?php
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
 		session_start();
 		UserPrintout();
-		if(!isAdmin())
+		if(!loggedIn())
 		{
-			echo "Must be logged in as an administrator in order to view this page.";
+			echo "Must be logged in as a user in order to view this page.";
 			die();
 		}
 		echo '<div align="center">';
 		checkTimeout();
-		if(!isset($_SESSION['orderID']))
+		if(!isset($_POST['submit1']))
 		{
-			echo "Must navigate to this page from order list page.";
+			echo "Must navigate to this page from user order list page.";
 			die();
 		}
-		displayOrderItems($_SESSION['orderID']);
+		echo "<b><u>Your Order Items </b></u></br></br>";
+		displayOrderItems($_POST['orderID']);
 		unset($_SESSION['orderID']);
 		?>
 	</body>

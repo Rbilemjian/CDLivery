@@ -6,7 +6,6 @@ session_start(); ?>
 		<title>RenameSuccess</title>
 	</head>
 	<body>
-	<p align="center">
 	<?php
 		if(loggedIn()==false)
 		{
@@ -14,6 +13,7 @@ session_start(); ?>
 		}
 		checkTimeout();
 		userPrintout();
+		echo '<div align="center">';
 		echo "Name successfully changed.";
 	?>
 	</body>

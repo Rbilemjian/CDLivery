@@ -8,6 +8,8 @@
 	<?php
 	session_start();
 	UserPrintout();
+	echo '<div align="center">';
+	echo '<b><u>Order Information</b></u></br>';
 	if(!loggedIn() || isAdmin())
 	{
 		die("Must be logged in as a user in order to view this page");
@@ -32,28 +34,28 @@
 	finalPrice:
 	if(isset($_SESSION['promoCode']))
 	{
-		echo "Price before Promo Code: ". $_SESSION['totalPrice'];
+		echo "<b>Price before Promo Code: </b>". $_SESSION['totalPrice'];
 		echo "<br/>";
-		echo "Price after Promo Code: ". $_SESSION['promoPrice'];
+		echo "<b>Price after Promo Code: </b>". $_SESSION['promoPrice'];
 		echo "<br/>";
 		$_SESSION['finalPrice'] = $_SESSION['promoPrice']*1.09;
 		$_SESSION['finalPrice'] = sprintf('%0.2f',$_SESSION['finalPrice']);
-		echo "Price after tax: ". $_SESSION['finalPrice'];
+		echo "<b>Price after tax: </b>". $_SESSION['finalPrice'];
 	}
 	else
 	{
-		echo "Price before tax: ". $_SESSION['totalPrice'];
+		echo "<b>Price before tax: </b>". $_SESSION['totalPrice'];
 		echo "<br/>";
 		$_SESSION['finalPrice'] = sprintf('%0.2f',$_SESSION['totalPrice'] * 1.09);
-		echo "Price after tax: ". $_SESSION['finalPrice'];
+		echo "<b>Price after tax: </b>". $_SESSION['finalPrice'];
 	}
 	echo "<br/>";
-	echo "<b>Shipping Information </b>";
+	echo "<b><u>Shipping Information </b></u>";
 	echo "<br/>";
 	$shippingInfo = $_SESSION['shippingInfo'];
 	echo "<b>Name:</b> ". $shippingInfo[0]. '<br/>'. "<b>Address: </b>". $shippingInfo[1]. ", ". $shippingInfo[2]. $shippingInfo[3]. " ". $shippingInfo[4]. " ". $shippingInfo[5];
 	echo "<br/>";
-	echo '<b>'."Payment Information ".'</b>';
+	echo '<b><u>'."Payment Information ".'</b></u>';
 	echo "<br/>";
 	$paymentInfo = $_SESSION['paymentInfo'];
 	echo "<b>Card Type </b>". $paymentInfo[0];
