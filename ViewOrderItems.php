@@ -10,12 +10,13 @@
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
 		session_start();
 		UserPrintout();
+		echo '<div align="center">';
+		echo '<b><u>Order Items</b></u></br></br>';
 		if(!isAdmin())
 		{
 			echo "Must be logged in as an administrator in order to view this page.";
 			die();
 		}
-		echo '<div align="center">';
 		checkTimeout();
 		if(!isset($_SESSION['orderID']))
 		{
