@@ -5,6 +5,7 @@
 	session_start();
 	UserPrintout();
 	echo '<div align="center">';
+	echo '<b><u>Removed Items</b></u></br></br>';
 	if(!isAdmin())
 	{
 		die("Must be logged in as an administrator to view this page");

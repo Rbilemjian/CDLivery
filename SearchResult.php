@@ -14,6 +14,8 @@
 			checkTimeout();
 		}
 		UserPrintout();
+		echo '<div align="center">';
+		echo '<b><u>Search Results</b></u></br></br>';
 		if(isset($_POST['search']))
 		{
 			$_SESSION['search'] = $_POST['search'];
@@ -23,6 +25,7 @@
 			die("Must search for something in order to view this page");
 		}
 		searchBar();
+		echo '</br></br>';
 		//show results here
 		if($_SESSION['search'] == "")
 		{
