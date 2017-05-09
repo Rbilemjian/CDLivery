@@ -18,6 +18,7 @@
 		checkTimeout();
 		?>
 		<div align="center">
+		<b><u>View Orders</b></u></br></br>
 		<form method=post>
 			<select name = "Dropdown">
 			<option value=0>View Both</option>

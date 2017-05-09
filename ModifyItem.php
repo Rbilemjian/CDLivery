@@ -4,6 +4,8 @@
 	require_once('C:/wamp64/www/cd/Includes/Functions.php');
 	session_start();
 	UserPrintout();
+	echo '<div align="center">';
+	echo '<b><u>Modify Item</b></u></br></br>';
 	if(!isAdmin())
 	{
 		die("Must be logged in as an admin to view this page");

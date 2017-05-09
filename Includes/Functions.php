@@ -12,7 +12,19 @@
 		}
 		return false;
 	}
-	
+	function checkPassword($password)
+	{
+		$password = hash('sha512',$password);
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		$result = mysqli_query($connection,"SELECT * FROM users where id={$_SESSION['id']}");
+		$user = mysqli_fetch_assoc($result);
+		$pass = $user['password'];
+		if($password == $pass)
+		{
+			return true;
+		}
+		return false;
+	}
 	function findUser($username,$password)
 	{
 		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
@@ -119,8 +131,33 @@
 		mysqli_close($connection);
 		return $result;
 	}
+	function cancelOrder($orderID)
+	{
+		$connection=mysqli_connect("localhost","cd_user","password","cd_livery");
+		$query = "delete from orders where id=$orderID";
+		$result = mysqli_query($connection, $query);
+		if(!$result)
+		{
+			die("Order to be cancelled does not exist");
+		}
+	}
 	function displayUserOrders()
 	{
+		if(isset($_POST['submit3']))
+		{
+			cancelOrder($_POST['orderID']);
+			echo "Successfully cancelled order";
+		}
+		if(isset($_POST['submit2']))
+		{
+			echo "Cancel order?";
+			?>
+			<form method="post">
+			<input type="hidden" name="orderID" value=<?php echo $_POST['orderID']?>>
+			<input type="submit" value="Cancel Order" name="submit3">
+			</form>
+			<?php
+		}
 		echo '<div align="center">';
 		$connection=mysqli_connect("localhost","cd_user","password","cd_livery");
 		$query = "select * from orders where userid={$_SESSION['id']} order by status";
@@ -130,7 +167,7 @@
 			die("No orders to show");
 		}
 		echo '<table border="1">';
-		echo "<tr><th>Shipping Name</th><th>Address Line 1</th><th>Address Line 2</th><th>City</th><th>State</th><th>Zip Code</th><th>Payment Name</th><th>Card Type</th><th>Card Number</th><th>Status</th><th>Promo Code</th><th>Price</th><th>View Items</th></tr>"; 
+		echo "<tr><th>Shipping Name</th><th>Address Line 1</th><th>Address Line 2</th><th>City</th><th>State</th><th>Zip Code</th><th>Payment Name</th><th>Card Type</th><th>Card Number</th><th>Status</th><th>Promo Code</th><th>Price</th><th>View Items</th><th>Cancel Order</th></tr>"; 
 		while($order = mysqli_fetch_assoc($result))
 		{
 			echo "<tr><td>";
@@ -187,11 +224,21 @@
 			echo '<div align="center">';
 			?>
 			<form method="post" action="ViewUserItems">
-					</br>
 					<input type="hidden" name="orderID" value=<?php echo $order['id']?>>
 					<input type="submit" value="View Items" name="submit1">
 					</form>
 			<?php
+			echo "</td><td>";
+			echo '<div align="center">';
+			if($order['status'] == "unfulfilled")
+			{
+				?>
+				<form method="post">
+				<input type="hidden" name="orderID" value=<?php echo $order['id']?>>
+				<input type="submit" value="Cancel Order" name="submit2">
+				</form>
+				<?php
+			}
 			echo "</td></tr>";
 		}
 		echo "</table>";
