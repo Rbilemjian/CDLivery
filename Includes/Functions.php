@@ -30,13 +30,10 @@
 	function findUserbyName($username)
 	{
 		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
-		$result = mysqli_query($connection,"SELECT * FROM users");
-		while($user=mysqli_fetch_assoc($result))
+		$result = mysqli_query($connection,"SELECT * FROM users where username='$username'");
+		if(mysqli_num_rows($result) == 1)
 		{
-			if($username == $user['username'])
-			{
-				return $user;
-			}
+			return mysqli_fetch_assoc($result);
 		}
 		return null;
 	}
@@ -70,6 +67,22 @@
 		{
 			return true;
 		}
+	}
+	function modifyName($name)
+	{
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		$query = "update users set username='$name' where id={$_SESSION['id']};";
+		$result = mysqli_query($connection,$query);
+		if(!$result)
+		{
+			die("Database query failed");
+		}
+		$_SESSION['username'] = $name;
+		redirectTo("RenameSuccess");
 	}
 	function newEntry($name,$genre,$stock,$releaseyear,$visible,$price,$type)
 	{
@@ -135,7 +148,9 @@
 			echo '&nbsp;&nbsp;&nbsp;&nbsp';
 			if($_SESSION['type'] == "user")
 			{
-				echo '<a href="Cart.php"><b>View Cart</b><a>';
+				echo '<a href="EditAccountInfo"<b>Edit Account</b></a>';
+				echo '&nbsp;&nbsp;&nbsp;&nbsp';
+				echo '<a href="Cart.php"><b>View Cart</b></a>';
 				echo '&nbsp;&nbsp;&nbsp;&nbsp';
 			}
 			echo '<a href="?logout=true"><b>Log out</b></a>';
