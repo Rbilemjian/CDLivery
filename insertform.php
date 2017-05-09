@@ -10,6 +10,7 @@
 ?>
 <body>
 <div align="center">
+<b><u>New Database Entry</b></u></br></br>
 <form action="InsertForm.php" method="post">
 Select an item type!
 <select id="ItemType" name="ItemType" method="post">

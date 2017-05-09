@@ -10,6 +10,7 @@
 		session_start();
 		UserPrintout();
 		echo '<div align="center">';
+		echo '<b><u>Edit User Privileges</b></u></br></br>';
 		if(!IsAdmin())
 		{
 			die("Must be logged in as an administrator in order to access this page");

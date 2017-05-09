@@ -12,7 +12,19 @@
 		}
 		return false;
 	}
-	
+	function checkPassword($password)
+	{
+		$password = hash('sha512',$password);
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		$result = mysqli_query($connection,"SELECT * FROM users where id={$_SESSION['id']}");
+		$user = mysqli_fetch_assoc($result);
+		$pass = $user['password'];
+		if($password == $pass)
+		{
+			return true;
+		}
+		return false;
+	}
 	function findUser($username,$password)
 	{
 		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
