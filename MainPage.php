@@ -14,10 +14,12 @@
 		<title>MainPage</title>
 	</head>
 	<body>
-		<p align="left">
+		<div align="center">
+		<b><u>CDlivery</b></u></br></br>
 		<?php
 		searchBar();
 		?>
+		<br />
 		<a href="MoviesPage.php">Movies Database</a>
 		<br />
 		<a href="AlbumsPage.php">Albums Database</a>
@@ -38,6 +40,8 @@
 		<a href="ViewOrders">View Orders</a>
 		<?php
 		}
+		echo '<br /><br /><b><u>Recently Added</b></u><br />';
+		recentlyAdded();
 		?>
 	</body>
 </html>

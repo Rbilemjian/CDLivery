@@ -6,6 +6,7 @@
 		echo '<a href="MainPage.php"><b>Main Page</b></a>';
 		echo '</br>';
 		echo '<p align="center">';
+		echo '<b><u>CDLivery Login Page</b></u>';
 		if(isset($_SESSION['timedOut']) && $_SESSION['timedOut']==true)
 		{
 			echo "Automatically logged out due to inactivity";

@@ -19,7 +19,9 @@
 			}
 		}
 ?>
+<html>
 <body>
+<div align="center">
 Enter a new username for your account
 </br>
 <form method="post">

@@ -10,7 +10,10 @@
 		require_once('C:/wamp64/www/cd/Includes/Functions.php');
 		session_start();
 		userPrintout();
+		echo '<div align="center">';
+		echo '<b><u>VideoGames</b></u></br></br>';
 		contextSearchBar();
+		echo '</br>';
 		if(isset($_POST['submit']))
 		{
 			if($_POST['search']=="")
