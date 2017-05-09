@@ -9,6 +9,7 @@
 		checkTimeout();
 ?>
 <body>
+<div align="center">
 <form action="InsertForm.php" method="post">
 Select an item type!
 <select id="ItemType" name="ItemType" method="post">
@@ -21,8 +22,11 @@ Select an item type!
 	Genre: <input type="text" name="genre"></br>
 	Stock: <input type="text" name="stock"></br>
 	Release Year: <input type="text" name="releaseyear"></br>
-	Visible (Yes/No): <input type="text" name="visible"></br>
 	Price: <input type="text" name="price"></br>
+	Visible: <select id="visible" name="visible" method="post">
+	<option value="1">Yes</option>
+	<option value="0">No</option>
+	</select><br />
 <input type="submit" name="submit" value="Submit">
 </form>
 </body>

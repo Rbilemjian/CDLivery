@@ -90,18 +90,6 @@
 		{
 			return "Error: All fields must be filled.";
 		}
-		if($visible == 'yes')
-		{
-			$visible = 1;
-		}
-		else if($visible == 'no')
-		{
-			$visible = 0;
-		}
-		else
-		{
-			return "Error: Only valid input for visible is yes/no";
-		}
 		if($type == 0)	$typename = 'Album';
 		if($type == 1)	$typename = 'Movie';
 		if($type == 2)	$typename = 'Game';
@@ -131,6 +119,85 @@
 		mysqli_close($connection);
 		return $result;
 	}
+	function displayUserOrders()
+	{
+		echo '<div align="center">';
+		$connection=mysqli_connect("localhost","cd_user","password","cd_livery");
+		$query = "select * from orders where userid={$_SESSION['id']} order by status";
+		$result = mysqli_query($connection, $query);
+		if(!$result || mysqli_num_rows($result) == 0)
+		{
+			die("No orders to show");
+		}
+		echo '<table border="1">';
+		echo "<tr><th>Shipping Name</th><th>Address Line 1</th><th>Address Line 2</th><th>City</th><th>State</th><th>Zip Code</th><th>Payment Name</th><th>Card Type</th><th>Card Number</th><th>Status</th><th>Promo Code</th><th>Price</th><th>View Items</th></tr>"; 
+		while($order = mysqli_fetch_assoc($result))
+		{
+			echo "<tr><td>";
+			echo '<div align="center">';
+			echo $order['shippingName'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['addressLine1'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			if($order['addressLine2'] == "")
+			{
+				echo "N/A";
+			}
+			else
+			{
+				echo $order['addressLine2'];
+			}
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['city'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['state'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['zipCode'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['paymentName'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo $order['cardType'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo "XXXXXXXXXXXX".substr($order['cardNumber'],12);
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo ucfirst($order['status']);
+			echo "</td><td>";
+			echo '<div align="center">';
+			if($order['promoCode'] == "")
+			{
+				echo "N/A";
+			}
+			else
+			{
+				echo $order['promoCode'];
+			}
+			echo "</td><td>";
+			echo '<div align="center">';
+			echo "$". $order['price'];
+			echo "</td><td>";
+			echo '<div align="center">';
+			?>
+			<form method="post" action="ViewUserItems">
+					</br>
+					<input type="hidden" name="orderID" value=<?php echo $order['id']?>>
+					<input type="submit" value="View Items" name="submit1">
+					</form>
+			<?php
+			echo "</td></tr>";
+		}
+		echo "</table>";
+		
+		
+	}
 	function UserPrintout()
 	{
 		echo '<p style="text-align:left;">';
@@ -152,6 +219,9 @@
 				echo '&nbsp;&nbsp;&nbsp;&nbsp';
 				echo '<a href="Cart.php"><b>View Cart</b></a>';
 				echo '&nbsp;&nbsp;&nbsp;&nbsp';
+				echo '<a href="ViewUserOrders"><b>View Orders</b></a>';
+				echo '&nbsp;&nbsp;&nbsp;&nbsp';
+
 			}
 			echo '<a href="?logout=true"><b>Log out</b></a>';
 		}
@@ -242,6 +312,18 @@
 		<?php
 	}
 	
+	function recentlyAdded()
+	{
+		if(!isAdmin())
+		{
+			printList("select * from cds where visible=1 and stock>0 order by id desc limit 5");
+		}
+		else
+		{
+			adminList("select * from cds order by id desc limit 5;");
+		}
+	}
+	
 	function contextGetResults($search,$type)
 	{
 		if(isAdmin())
@@ -274,6 +356,7 @@
 	
 	function addToCart($userid,$itemid)
 	{
+		echo '<div align="center">';
 		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
 		if(mysqli_connect_errno())
 		{
@@ -325,6 +408,7 @@
 	}
 	function displayCart($id)
 	{
+		echo '<div align="center">';
 		if(isset($_POST['itemNum']) && isset($_POST['Quantity']))
 		{
 			changeQuantity($_POST['Quantity'],$_POST['itemNum']);
@@ -562,7 +646,7 @@
 			die("There are not currently any cds of that type available.");
 		}
 		echo '<table border="1">';
-		echo "<tr><th>Title</th><th>Genre</th><th>Year of Release</th><th>Stock</th><th>Type</th><th>Price</th><th>Change Stock</th><th>Remove Item</th></tr>"; 
+		echo "<tr><th>Title</th><th>Genre</th><th>Year of Release</th><th>Stock</th><th>Type</th><th>Price</th><th>Visible</th><th>Change Stock</th><th>Remove Item</th></tr>"; 
 		while($cd = mysqli_fetch_assoc($result))
 		{
 			$id=$cd["id"];
@@ -584,6 +668,16 @@
 			echo "</td><td>";
 			echo '<div align="center">';
 			echo '$'.$cd["price"];
+			echo "</td><td>";
+			echo '<div align="center">';
+			if($cd['visible']==1)
+			{
+				echo "Yes";
+			}
+			else
+			{
+				echo "No";
+			}
 			echo "</td><td>";
 			echo '<div align="center">';
 			?>
@@ -676,9 +770,25 @@
 			}
 			echo "Successfully changed price.<br/>";
 		}
+		if(isset($_POST['visible']) && $_POST['visible']!=-1)
+		{
+			$visible = $_POST['visible'];
+			$query = "update cds set visible=$visible where id=$id;";
+			$result = mysqli_query($connection,$query);
+			if(!$result)
+			{
+				die("Error: Visibility could not be changed. <br/ >");
+			}
+			echo "Successfully changed visibility. <br/>";
+		}
+		else if(isset($_POST['submit']))
+		{
+			echo "Please enter a valid input into one of the fields in order to modify the selected CD.";
+		}
 	}
 	function ModifyItem($id)
 	{
+		echo '<div align="center">';
 		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
 		ExecuteModifications($id);
 		if(mysqli_connect_errno())
@@ -695,7 +805,7 @@
 		}
 		$cd = mysqli_fetch_assoc($result);
 		echo '<table border="1">';
-		echo "<tr><th>Title</th><th>Genre</th><th>Year of Release</th><th>Stock</th><th>Type</th><th>Price</th></tr>"; 
+		echo "<tr><th>Title</th><th>Genre</th><th>Year of Release</th><th>Stock</th><th>Type</th><th>Price</th><th>Visible</th></tr>"; 
 		echo "<tr><td>";
 		echo '<div align="center">';
 		echo $cd["name"];
@@ -714,13 +824,23 @@
 		echo "</td><td>";
 		echo '<div align="center">';
 		echo '$'.$cd["price"];
+		echo "</td><td>";
+		echo '<div align="center">';
+		if($cd['visible'] == 1)
+		{
+			echo "Yes";
+		}
+		else
+		{
+			echo "No";
+		}
 		echo "</td><tr>";
 		echo "</table>";
 		echo "</br>";
 		?>
 		Make any modification needed
 		<form action="ModifyItem.php" method="post">
-		<select id="ItemType" name="ItemType" method="post">
+		Type: <select id="ItemType" name="ItemType" method="post">
 		<option value="-1">Select one</option>
 		<option value="0">Album</option>
 		<option value="1">Movie</option>
@@ -732,6 +852,12 @@
 		Stock: <input type="text" name="stock"></br>
 		Release Year: <input type="text" name="releaseyear"></br>
 		Price: <input type="text" name="price"></br>
+		Visible: <select id="visible" name="visible" method="post">
+		<option value="-1">Select one</option>
+		<option value="1">Yes</option>
+		<option value="0">No</option>
+		</select>
+		</br>
 		<input type="submit" name="submit" value="Submit">
 		</form>
 		<?php
@@ -835,7 +961,7 @@
 		{
 			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
 		}
-		$query = "select * from users where type='$type';";
+		$query = "select * from users where type='$type' and id!={$_SESSION['id']};";
 		$result = mysqli_query($connection,$query);
 		if(!$result)
 		{
@@ -849,7 +975,7 @@
 			echo $user["username"];
 			echo "</td><td>";
 			echo '<div align="center">';
-			echo $user["type"];
+			echo ucfirst($user["type"]);
 			echo "</td><td>";
 			echo '<div align="center">';
 			if($user['type'] == "admin")
@@ -971,7 +1097,7 @@
 			echo $order['expDate'];
 			echo "</td><td>";
 			echo '<div align="center">';
-			echo $order['status'];
+			echo ucfirst($order['status']);
 			echo "</td><td>";
 			echo '<div align="center">';
 			if($order['promoCode'] == "")
@@ -1118,6 +1244,8 @@
 			}
 		}
 		?>
+		<div align="center">
+		<b>Enter payment information</b>
 		<form method="post">
 		Select Credit Card Type
 		<select id="ItemType" name="ItemType" method="post">
@@ -1160,6 +1288,7 @@
 			}
 		}
 		?>
+		<div align="center">
 		<form action="ShippingInfo.php" method="post">
 		<b>Enter an Address Within the United States</b>
 		</br>
@@ -1196,6 +1325,7 @@
 			}
 		}
 		?>
+		<div align="center">
 		<form action="PromoCodePage.php" method="post">
 		<b>Enter a Promo Code if you have one</b>
 		</br>

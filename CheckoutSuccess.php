@@ -15,8 +15,8 @@
 		}
 		checkTimeout();
 		clearCart($_SESSION['id']);
+		echo '<div align="center">';
 		echo "Order was successfully placed. ";
 	?>
-	<a href="MainPage">Main Page</a>
 	</body>
 </html>

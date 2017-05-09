@@ -3,7 +3,7 @@
 
 <html lang="en">
 	<head>
-		<title>Cart</title>
+		<title>User Orders</title>
 	</head>
 	<body>
 	<?php
@@ -11,11 +11,11 @@
 		session_start();
 		UserPrintout();
 		echo '<div align="center">';
-		echo '<b><u>Cart</b></u></br></br>';
+		echo '<b><u>Your Orders</b></u></br></br>';
 		if(loggedIn())
 		{
 			checkTimeout();
-			displayCart($_SESSION['id']);
+			displayUserOrders();
 		}
 		else
 		{

@@ -14,7 +14,10 @@
 			checkTimeout();
 		}
 		UserPrintout();
+		echo '<div align="center">';
+		echo '<b><u>Movies</b></u></br></br>';
 		contextSearchBar();
+		echo "</br>";
 		if(isset($_POST['submit']))
 		{
 			if($_POST['search']=="")
