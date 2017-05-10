@@ -160,7 +160,7 @@
 		}
 		echo '<div align="center">';
 		$connection=mysqli_connect("localhost","cd_user","password","cd_livery");
-		$query = "select * from orders where userid={$_SESSION['id']} order by status";
+		$query = "select * from orders where userid={$_SESSION['id']} order by status desc";
 		$result = mysqli_query($connection, $query);
 		if(!$result || mysqli_num_rows($result) == 0)
 		{
@@ -603,14 +603,18 @@
 		$result = mysqli_query($connection,$query);
 		$cartitem = mysqli_fetch_assoc($result);
 		//checking if any items' stocks are lower than requested amount in cart
-		$badItems = checkStock($cartitem['itemids'],$cartitem['quantities']);
-		if(count($badItems)>0)
+		$quantities = $cartitem['quantities'];
+		$quantities = unserialize($quantities);
+		$itemids=$cartitem['itemids'];
+		$itemids=unserialize($itemids);
+		$itemid = $itemids[$itemnum];
+		$badItem = checkStockCart($quantity,$itemid);
+		if($badItem!=null)
 		{
+			$badItems = array($badItem);
 			reportStockDeficit($badItems);
 			return;
 		}
-		$quantities = $cartitem['quantities'];
-		$quantities = unserialize($quantities);
 		$quantities[$itemnum] = $quantity;
 		$quantities = serialize($quantities);
 		$query="UPDATE carts ";
@@ -635,6 +639,28 @@
 		mysqli_close($connection);
 		return;
 		
+	}
+	
+	function checkStockCart($quantity,$itemid)
+	{
+		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
+		if(mysqli_connect_errno())
+		{
+			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
+		}
+		$query = "select * from cds where id=$itemid";
+		$result = mysqli_query($connection,$query);
+		if(!$result)
+		{
+			die("Database query failed");
+		}
+		$item = mysqli_fetch_assoc($result);
+		$stock = $item['stock'];
+		if($stock<$quantity)
+		{
+			return $itemid;
+		}
+		return null;
 	}
 	
 	//Administrator Functions
@@ -744,6 +770,7 @@
 	}
 	function ExecuteModifications($id)
 	{
+		$modification = false;
 		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
 		if(isset($_POST['ItemType']) && $_POST['ItemType']!=-1)
 		{
@@ -760,6 +787,7 @@
 			{
 				die("Error: Item type could not be changed. <br/>");
 			}
+			$modification = true;
 			echo "Successfully changed item type. <br/>";	
 		}
 		if(isset($_POST['name']) && $_POST['name']!="")
@@ -771,6 +799,7 @@
 			{
 				die("Error: Name could not be changed. <br/ >");
 			}
+			$modification = true;
 			echo "Successfully changed name. <br/ >";
 		}
 		if(isset($_POST['genre']) && $_POST['genre']!="")
@@ -782,6 +811,7 @@
 			{
 				die("Error: Genre could not be change. <br/>");
 			}
+			$modification = true;
 			echo "Successfully changed genre.<br/>";
 		}
 		if(isset($_POST['stock']) && $_POST['stock']!="")
@@ -793,6 +823,7 @@
 			{
 				die("Error: Stock could not be changed. <br/>");
 			}
+			$modification = true;
 			echo "Successfully changed stock.<br/>";
 		}
 		if(isset($_POST['releaseyear']) && $_POST['releaseyear']!="")
@@ -804,6 +835,7 @@
 			{
 				die("Error: Release year could not be changed. <br/>");
 			}
+			$modification = true;
 			echo "Successfully changed release year.<br/>";
 		}
 		if(isset($_POST['price']) && $_POST['price'] != "")
@@ -815,6 +847,7 @@
 			{
 				die("Error: Price could not be changed. <br/>");
 			}
+			$modification = true;
 			echo "Successfully changed price.<br/>";
 		}
 		if(isset($_POST['visible']) && $_POST['visible']!=-1)
@@ -826,9 +859,10 @@
 			{
 				die("Error: Visibility could not be changed. <br/ >");
 			}
+			$modification = true;
 			echo "Successfully changed visibility. <br/>";
 		}
-		else if(isset($_POST['submit']))
+		else if(isset($_POST['submit']) && $modification == false)
 		{
 			echo "Please enter a valid input into one of the fields in order to modify the selected CD.";
 		}
@@ -1278,12 +1312,17 @@
 	
 	function paymentForm()
 	{
+		echo '<div align="center">';
 		if(isset($_POST['submit']))
 		{
 			if($_POST['ItemType'] == ""||$_POST['name']==""||$_POST['CCnum']==""
 			||$_POST['CVCnum']==""||$_POST['expDate']=="")
 			{
 				echo "Error: All fields must be filled";
+			}
+			else if(strlen($_POST['CVCnum'])!=3||strlen($_POST['expDate'])>5||strlen($_POST['expDate']<4))
+			{
+				echo "CVC or expiration date input was not valid.";
 			}
 			else
 			{
@@ -1312,7 +1351,7 @@
 		</br>
 		Name as it appears on the card: <input type="text" name="name"></br>
 		Credit Card Number: <input type="text" name="CCnum"></br>
-		CVC Number: <input type="text" name="CVCnum"></br>
+		CVC Number: <input type="number" name="CVCnum"></br>
 		Expiration Date: <input type="text" name="expDate"></br>
 		<input type="submit" name="submit" value="Next">
 		</form>
@@ -1412,7 +1451,7 @@
 		$result = mysqli_query($connection,$query);
 		if(!$result)
 		{
-			die("Database query failed");
+			die("Database query failed 1416");
 		}
 		modifyStocks($items,$quantities);
 		redirectTo("CheckoutSuccess");
@@ -1454,12 +1493,12 @@
 			die("Database connection failed: " . mysqli_connect_error() . " (" . mysqli_connect_errno() . ")");
 		}
 		$itemids = unserialize($items);
-		$quantitites = unserialize($quantities);
+		$quantities = unserialize($quantities);
 		$stock = 0;
 		for($i = 0;$i<count($quantities);$i++)
 		{
 			$currItem = fetchItem($itemids[$i]);
-			$stock = currItem['stock'];
+			$stock = $currItem['stock'];
 			$stock = $stock-$quantities[$i];
 			$query = "update cds set stock=$stock where id={$itemids[$i]};";
 			$result = mysqli_query($connection, $query);
