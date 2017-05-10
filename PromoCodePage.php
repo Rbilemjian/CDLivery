@@ -8,6 +8,7 @@
 	<?php
 		session_start();
 		UserPrintout();
+		echo '<div align="center">';
 		if(!loggedIn() || isAdmin())
 		{
 			die("Must be logged in as a user in order to access this page");

@@ -6,6 +6,7 @@
 	</head>
 	<body>
 	<?php
+		echo '<div align="center">';
 		if(loggedIn())
 		{
 			checkTimeout();

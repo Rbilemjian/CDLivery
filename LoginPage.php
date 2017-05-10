@@ -5,7 +5,7 @@
 		echo '<p align = "left">';
 		echo '<a href="MainPage.php"><b>Main Page</b></a>';
 		echo '</br>';
-		echo '<p align="center">';
+		echo '<div align="center">';
 		echo '<b><u>CDLivery Login Page</b></u></br>';
 		if(isset($_SESSION['timedOut']) && $_SESSION['timedOut']==true)
 		{

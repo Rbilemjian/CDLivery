@@ -9,6 +9,7 @@
 		require_once('C:/wamp64/www/cd/Includes/Functions.php'); 
 		session_start();
 		UserPrintout();
+		echo '<div align="center">';
 		if(!loggedIn() || isAdmin())
 		{
 			die("Must be logged in as a user in order to view this page");

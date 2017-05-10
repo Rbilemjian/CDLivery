@@ -10,6 +10,7 @@
 </body>
 </html>
 <?php
+	echo '<div align="center">';
 	if(isAdmin() || !loggedIn())
 	{
 		die("Must be logged in as user to access this page");

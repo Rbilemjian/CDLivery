@@ -2,6 +2,7 @@
 		require_once('C:/wamp64/www/cd/Includes/Functions.php'); 
 		session_start();
 		UserPrintout();
+		echo '<div align="center">';
 		if(!IsAdmin())
 		{
 			die("Must be logged in as an administrator in order to add item.");
