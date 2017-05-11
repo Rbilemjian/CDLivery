@@ -126,7 +126,7 @@
 		} 
 		else 
 		{
-			die("Database query failed. " . mysqli_error($connection));
+			die("Database query failed. Ensure no field had extraneous or invalid characters.");
 		}
 		mysqli_close($connection);
 		return $result;
@@ -693,6 +693,7 @@
 	}
 	function AdminList($query)
 	{
+		echo '<div align="center">';
 		if(isset($_POST['modify']))
 		{
 			$_SESSION['itemID'] = $_POST['itemID'];
@@ -945,6 +946,7 @@
 	}
 	function RemoveItem($id)
 	{
+		echo '<div align="center">';
 		$connection = mysqli_connect("localhost","cd_user","password","cd_livery");
 		if(mysqli_connect_errno())
 		{
