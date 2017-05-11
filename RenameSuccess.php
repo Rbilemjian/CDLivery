@@ -14,7 +14,7 @@ session_start(); ?>
 		checkTimeout();
 		userPrintout();
 		echo '<div align="center">';
-		echo "Name successfully changed.";
+		echo "Account information successfully changed.";
 	?>
 	</body>
 </html>
