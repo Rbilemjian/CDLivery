@@ -21,6 +21,10 @@
 		$pass = $user['password'];
 		if($password == $pass)
 		{
+			echo $password;
+			echo '</br>';
+			echo $pass;
+			die();
 			return true;
 		}
 		return false;
@@ -258,12 +262,13 @@
 		}
 		if(isset($_SESSION['username']))
 		{
-			echo '<p style = "text-align:right; margin-top:-34px;">'."Logged in as: ".'<b>'.$_SESSION['username'].'</b>';
+			echo '<p style = "text-align:right; margin-top:-34px;">';
+			echo "Logged in as: ".'<b>'.$_SESSION['username'].'</b>';
+			echo '&nbsp;&nbsp;&nbsp;&nbsp';
+			echo '<a href="EditAccountInfo"<b>Edit Account</b></a>';
 			echo '&nbsp;&nbsp;&nbsp;&nbsp';
 			if($_SESSION['type'] == "user")
 			{
-				echo '<a href="EditAccountInfo"<b>Edit Account</b></a>';
-				echo '&nbsp;&nbsp;&nbsp;&nbsp';
 				echo '<a href="Cart.php"><b>View Cart</b></a>';
 				echo '&nbsp;&nbsp;&nbsp;&nbsp';
 				echo '<a href="ViewUserOrders"><b>View Orders</b></a>';
