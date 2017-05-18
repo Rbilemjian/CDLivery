@@ -13,6 +13,7 @@
 		echo '<p align = "left">';
 		echo '<a href="MainPage.php"><b>Main Page</b></a>';
 		echo '</br>';
+		echo '<p align="center">';
 		if(isset($_POST['register1']))
 		{
 			$required_fields = array("username","password","password2");
@@ -36,10 +37,11 @@
 				echo "<br />";
 				goto errorcheckingdone;
 			}
-			if($_POST["password"] != $_POST["password2"])
+			if(strcmp($_POST["password"],$_POST["password2"])!=0)
 			{
 				echo "Passwords do not match.";
 				echo "<br />";
+				goto errorcheckingdone;
 			}
 			if(addUser($_POST["username"],$_POST["password"]))
 			{
